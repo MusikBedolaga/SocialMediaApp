@@ -19,8 +19,8 @@ class HeaderPostView: UIView {
         return view
     }()
     
-    private let profileImage: UIImageView = {
-        let image = UIImageView(image: UIImage(named: "profileImage"))
+    public let profileImage: UIImageView = {
+        let image = UIImageView(image: UIImage(named: "profileImage")) // почистить
         image.translatesAutoresizingMaskIntoConstraints = false
         image.layer.cornerRadius = 20
         image.layer.masksToBounds = true
@@ -28,20 +28,18 @@ class HeaderPostView: UIView {
         return image
     }()
     
-    private let name: UILabel = {
+    public let name: UILabel = {
         let name = UILabel()
         name.translatesAutoresizingMaskIntoConstraints = false
-        name.text = "kafajfaofa"
         name.textColor = .black
         name.font = UIFont.systemFont(ofSize: 13, weight: .bold)
         name.numberOfLines = 0
         return name
     }()
     
-    private let nickName: UILabel = {
+    public let nickName: UILabel = {
         let name = UILabel()
         name.translatesAutoresizingMaskIntoConstraints = false
-        name.text = "@afmkafa"
         name.textColor = .customRed
         name.font = UIFont.systemFont(ofSize: 13, weight: .light)
         name.numberOfLines = 0
@@ -84,6 +82,7 @@ class HeaderPostView: UIView {
         ])
         
         profileView.addSubview(profileImage)
+        
         //MARK: profileImage
         NSLayoutConstraint.activate([
             profileImage.centerXAnchor.constraint(equalTo: profileView.centerXAnchor),
@@ -96,8 +95,8 @@ class HeaderPostView: UIView {
 
 
 class BodyPostView: UIView {
-    private let imageContent: UIImageView = {
-        let image = UIImageView(image: UIImage(named: "contentImage"))
+    public var imageContent: UIImageView = {
+        let image = UIImageView(image: UIImage(named: "contentImage")) // почистить
         image.translatesAutoresizingMaskIntoConstraints = false
         image.layer.masksToBounds = true
         image.backgroundColor = .lightGray
@@ -266,5 +265,16 @@ class PostlCollectionViewCell: UICollectionViewCell {
             bodyPostView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
             bodyPostView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10)
         ])
+    }
+    
+    public func setupCell(post: Post) {
+        bodyPostView.imageContent.image = UIImage(data: post.content ?? Data())
+        headerPostView.name.text = post.user?.name ?? "aaa"
+        if let nickname = post.user?.name {
+            headerPostView.nickName.text = "@\(nickname)"
+        } else {
+            headerPostView.nickName.text = "@defaultTag"
+        }
+        headerPostView.profileImage.image = UIImage(data: (post.user?.photo) ?? Data())
     }
 }

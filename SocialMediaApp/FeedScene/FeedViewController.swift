@@ -14,11 +14,18 @@ class FeedViewController: UIViewController {
     
     var coordinator: UINavigationController?
     
-    private let viewModel = FeedViewModel()
-
+    private lazy var feedViewModel = FeedViewModel(delegate: self)
+    
+    private lazy var frc = feedViewModel.fetchResultController
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        feedView.postCollection.reloadData()
     }
     
     private func setupView() {
@@ -95,7 +102,7 @@ extension FeedViewController: UICollectionViewDataSource {
         if collectionView == feedView.historyCollection {
             return 7
         } else {
-            return 10
+            return frc.fetchedObjects?.count ?? 0
         }
     }
     
@@ -106,9 +113,24 @@ extension FeedViewController: UICollectionViewDataSource {
             return cell
         } else {
             let cell = feedView.postCollection.dequeueReusableCell(withReuseIdentifier: PostlCollectionViewCell.identifier, for: indexPath) as! PostlCollectionViewCell
+            cell.setupCell(post: frc.object(at: indexPath))
             cell.backgroundColor = .clear
             return cell
         }
     }
 }
 
+
+//MARK: - NSFetchedResultsControllerDelegate
+extension FeedViewController: NSFetchedResultsControllerDelegate {
+    
+    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        feedView.historyCollection.reloadData()
+        feedView.postCollection.reloadData()
+        }
+
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        feedView.historyCollection.reloadData()
+        feedView.postCollection.reloadData()
+    }
+}

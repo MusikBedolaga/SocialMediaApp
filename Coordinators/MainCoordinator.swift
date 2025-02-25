@@ -28,6 +28,16 @@ class MainCoordinator {
         navigationController.present(commentsVC, animated: true)
     }
     
+    func goToUpdatedFeed() {
+        tabBarController.selectedIndex = 0
+            
+        if let navigationController = tabBarController.viewControllers?.first as? UINavigationController {
+        let newFeedVC = FeedViewController()
+            navigationController.setViewControllers([newFeedVC], animated: true)
+        }
+    }
+    
+    
     private func setupTabBar() {
         
         let feedVC = FeedViewController()
@@ -40,6 +50,7 @@ class MainCoordinator {
         
         let newPublicationVC = NewPublicationViewController()
         let newPublicationNavController = UINavigationController(rootViewController: newPublicationVC)
+        newPublicationVC.coordinator = self
         newPublicationNavController.tabBarItem = TabBarItemFactory.createTabBarItem(title: "Новый пост", systemNameImg: "plus", tag: 2)
         
         let profileVC = ProfileViewController()
@@ -55,5 +66,4 @@ class MainCoordinator {
         tabBarController.tabBar.unselectedItemTintColor = .lightGray
         tabBarController.viewControllers = [feedNavController, messagesNavController, newPublicationNavController, profileNavController, settingsNavController]
     }
-    
 }

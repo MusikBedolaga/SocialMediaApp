@@ -11,6 +11,10 @@ protocol ImageViewPikerDelegate: AnyObject {
     func selectPhoto()
 }
 
+protocol RegisterViewDelegate: AnyObject, ImageViewPikerDelegate {
+    func createNewUser()
+}
+
 class ImageViewPiker: UIView {
     
     private weak var delegate: ImageViewPikerDelegate?
@@ -75,10 +79,6 @@ class ImageViewPiker: UIView {
     @objc private func selectPhoto() {
         delegate?.selectPhoto()
     }
-}
-
-protocol RegisterViewDelegate: AnyObject, ImageViewPikerDelegate {
-    func createNewUser()
 }
 
 class RegisterView: UIView {

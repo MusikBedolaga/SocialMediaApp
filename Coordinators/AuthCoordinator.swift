@@ -30,6 +30,10 @@ class AuthCoordinator {
     func showRegisterScene() {
         let registerVC = RegisterViewController()
         registerVC.coordinator = self
-        navigationController.setViewControllers([registerVC], animated: true)
+        navigationController.pushViewController(registerVC, animated: true)
+    }
+    
+    func showLoginView() {
+        navigationController.popViewController(animated: true)
     }
 }

@@ -17,6 +17,7 @@ class RegisterViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         layout()
+        navigationItem.hidesBackButton = true
     }
     
     private func layout() {
@@ -76,7 +77,7 @@ extension RegisterViewController: UINavigationControllerDelegate { }
 extension RegisterViewController: UserViewModelDelegateRegister {
     func didRegister(succes: Bool) {
         if succes {
-            coordinator?.start()
+            coordinator?.showLoginView()
         }
         else {
             let okAlert = UIAlertController(title: "Ошибка", message: "Неправильно веден логин или пароль", preferredStyle: .alert)

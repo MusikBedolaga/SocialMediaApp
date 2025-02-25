@@ -42,13 +42,28 @@ class CoreDataManager {
     }
     
     //MARK: - User
+    
+    func setCurrentUser(user: User) {
+        UserDefaults.standard.set(user.userId, forKey: "currentUserId")
+    }
+    
+    func getCurrentUser(completion: @escaping (User?) -> Void) {
+        let context = persistentContainer.viewContext
+        if let userId = UserDefaults.standard.value(forKey: "currentUserId") as? Int64 {
+            getUserForId(userId: userId, context: context, completion: completion)
+        } else {
+            completion(nil)
+        }
+    }
+
+    
     func addUser(newUser: User) {
         persistentContainer.performBackgroundTask { context in
             let user = User(context: context)
             user.name = newUser.name
             user.tag = newUser.tag
             user.photo = newUser.photo
-            user.userId = newUser.userId
+            user.userId = Int64(arc4random())
             user.email = newUser.email
             user.posts = newUser.posts
             do {
@@ -83,24 +98,48 @@ class CoreDataManager {
         }
     }
     
-    
-    //MARK: - Post
-    func addPost(newPost: Post) {
+    func getUserForEmail(email: String, completion: @escaping (User?) -> Void) {
         persistentContainer.performBackgroundTask { context in
-            let post = Post(context: context)
-            post.likes = "\(0)"
-            post.countComments = "\(0)"
-            post.content = newPost.content
-            post.id = newPost.id
-            post.user = newPost.user
+            let fetchRequest: NSFetchRequest<User> = User.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "email == %@", email)
+
             do {
-                try context.save()
+                let result = try context.fetch(fetchRequest)
+                if let user = result.first {
+                    completion(user)
+                } else {
+                    completion(nil)
+                }
             } catch {
-                print("Error: \(error.localizedDescription)")
+                print("Failed to fetch user: $error.localizedDescription)")
+                completion(nil)
             }
         }
     }
     
+    private func getUserForId(userId: Int64, context: NSManagedObjectContext, completion: @escaping (User?) -> Void) {
+
+        let fetchRequest: NSFetchRequest<User> = User.fetchRequest()
+
+        fetchRequest.predicate = NSPredicate(format: "userId == %lld", userId)
+
+        do {
+
+            let result = try context.fetch(fetchRequest)
+
+            completion(result.first)
+
+        } catch {
+
+            print("Failed to fetch user: $error.localizedDescription)")
+
+            completion(nil)
+
+        }
+
+    }
+    
+    //MARK: - Post
     func deletePost(delPost: Post) {
         persistentContainer.performBackgroundTask { context in
             context.delete(delPost)
@@ -124,4 +163,45 @@ class CoreDataManager {
             }
         }
     }
+    
+    func addPostToUser(userId: Int64, postContent: Data, completion: @escaping (Bool) -> Void) {
+        persistentContainer.performBackgroundTask { context in
+            self.getUserForId(userId: userId, context: context) { user in
+                guard let user = user else {
+                    completion(false)
+                    return
+                }
+
+                let post = Post(context: context)
+                post.content = postContent
+                post.id = Int64(arc4random())
+                post.likes = "0"
+                post.countComments = "0"
+                post.user = user
+
+                do {
+                    try context.save()
+                    completion(true)
+                } catch {
+                    print("Ошибка при добавлении поста: $error.localizedDescription)")
+                    completion(false)
+                }
+            }
+        }
+    }
+    
+    func getAllPostsForUser(userId: Int64, completion: @escaping ([Post]) -> Void) {
+            persistentContainer.performBackgroundTask { context in
+                let fetchRequest: NSFetchRequest<Post> = Post.fetchRequest()
+                fetchRequest.predicate = NSPredicate(format: "user.userId == %lld", userId) // Здесь предполагается, что в сущности Post есть связь с User
+
+                do {
+                    let posts = try context.fetch(fetchRequest)
+                    completion(posts)
+                } catch {
+                    print("Ошибка при извлечении постов: $error.localizedDescription)")
+                    completion([])
+                }
+            }
+        }
 }

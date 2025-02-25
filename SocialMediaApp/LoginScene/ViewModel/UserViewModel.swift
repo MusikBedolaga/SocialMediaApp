@@ -55,4 +55,5 @@ class UserViewModel {
         }
         delegateReg?.didRegister(succes: false)
     }
+    
 }

@@ -9,7 +9,8 @@ import Foundation
 import CoreData
 
 class FeedViewModel {
-    static let fetchResultController: NSFetchedResultsController<Post> = {
+    
+    lazy var fetchResultController: NSFetchedResultsController<Post> = {
         let request = Post.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "likes", ascending: false)]
         let frc = NSFetchedResultsController(fetchRequest: request, managedObjectContext: CoreDataManager.defaultConfig.persistentContainer.viewContext, sectionNameKeyPath: nil, cacheName: nil)
@@ -20,4 +21,8 @@ class FeedViewModel {
         }
         return frc
     }()
+    
+    init(delegate: NSFetchedResultsControllerDelegate) {
+        fetchResultController.delegate = delegate
+    }
 }

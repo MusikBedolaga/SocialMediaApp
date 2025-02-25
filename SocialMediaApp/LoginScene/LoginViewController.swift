@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CoreData
 
 class LoginViewController: UIViewController {
 
@@ -14,6 +15,8 @@ class LoginViewController: UIViewController {
     private lazy var loginView: LoginView = LoginView(delegate: self)
     
     private lazy var userViewModel = UserViewModel(type: .login(self))
+    
+    private let coreDataManager = CoreDataManager.defaultConfig
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,8 +48,14 @@ extension LoginViewController: LoginViewDelegate {
 //MARK: - UserViewModelDelegate
 extension LoginViewController: UserViewModelDelegateLogin {
     func didAuthenticate(succes: Bool) {
+        coreDataManager.getUserForEmail(email: getUserName()) { user in
+            if let user = user {
+                currentUserId = user.userId
+                self.coreDataManager.setCurrentUser(user: user)
+            }
+        }
         if succes {
-            coordinator?.showMainScene()
+            self.coordinator?.showMainScene()
         }
         else {
             let okAlert = UIAlertController(title: "Ошибка", message: "Неправильный логин или пароль", preferredStyle: .alert)
