@@ -54,7 +54,8 @@ extension MessagesViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print("Переход на лс")
+        let personalMessageVC = PersonalMessageViewController()
+        navigationController?.pushViewController(personalMessageVC, animated: true)
     }
     
 }

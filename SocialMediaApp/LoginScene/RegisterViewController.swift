@@ -17,11 +17,11 @@ class RegisterViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         layout()
-        navigationItem.hidesBackButton = true
     }
     
     private func layout() {
         view = registerView
+        navigationItem.hidesBackButton = true
     }
     
     private func getUserName() -> String {
