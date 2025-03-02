@@ -204,4 +204,76 @@ class CoreDataManager {
                 }
             }
         }
+    
+    
+    //MARK: Message
+    func addNewMessage(content: String,
+                       conversation: Conversation,
+                       sender: User,
+                       receiver: User
+    ) {
+        persistentContainer.performBackgroundTask { context in
+            let conversationInContext = context.object(with: conversation.objectID) as? Conversation
+            let senderInContext = context.object(with: sender.objectID) as? User
+            let receiverInContext = context.object(with: receiver.objectID) as? User
+            
+            guard let conversation = conversationInContext,
+                let sender = senderInContext,
+                let receiver = receiverInContext else {
+                print("Ошибка: Не удалось получить объекты в фоновом контексте")
+                return
+            }
+            
+            let message = Messages(context: context)
+            message.content = content
+            message.dateSent = Date()
+            message.conversation = conversationInContext
+            message.receiver = receiverInContext
+            message.sender = senderInContext
+            
+            do {
+                try context.save()
+            } catch {
+                print("Error: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    //MARK: Conversation
+    func addNewConversation(user1: User, user2: User) {
+        if chatExistsBetween(user1: user1, user2: user2) {
+            print("Чат уже существует между \(user1.name ?? "Unknown") и \(user2.name ?? "Unknown")")
+            return
+        }
+        
+        persistentContainer.performBackgroundTask { context in
+            let conversation = Conversation(context: context)
+            
+            let user1InContext = context.object(with: user1.objectID) as? User
+            let user2InContext = context.object(with: user2.objectID) as? User
+            
+            conversation.user1 = user1InContext
+            conversation.user2 = user2InContext
+            do {
+                try context.save()
+            } catch {
+                print("Error: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    func chatExistsBetween(user1: User, user2: User) -> Bool {
+        let fetchRequest: NSFetchRequest<Conversation> = Conversation.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format:
+            "(user1 == %@ AND user2 == %@) OR (user1 == %@ AND user2 == %@)", user1, user2, user2, user1)
+
+        do {
+            let count = try persistentContainer.viewContext.count(for: fetchRequest)
+            return count > 0
+        } catch {
+            print("Ошибка проверки чата: \(error.localizedDescription)")
+            return false
+        }
+    }
+
 }

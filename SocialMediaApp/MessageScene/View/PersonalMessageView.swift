@@ -17,14 +17,13 @@ class PersonalMessageView: UIView {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.register(PersonalMessageCollectionViewCell.self, forCellWithReuseIdentifier: PersonalMessageCollectionViewCell.identifier)
-        layout.estimatedItemSize = CGSize(width: UIScreen.main.bounds.width - 10, height: 50)
-        collectionView.backgroundColor = .customBlue
+        collectionView.backgroundColor = .white
         return collectionView
     }()
     
     private weak var delegate: OutputMessageViewDelegate?
     
-    private let outputMessageView: OutputMessageView
+    public let outputMessageView: OutputMessageView
     
     init(delegate: OutputMessageViewDelegate) {
         self.outputMessageView = OutputMessageView()
@@ -39,11 +38,12 @@ class PersonalMessageView: UIView {
     }
     
     private func setupView() {
+        
         [informationMessageView, personalMessageCollectionView, outputMessageView].forEach({ addSubview($0) })
         
         //MARK: informationMessageView
         NSLayoutConstraint.activate([
-            informationMessageView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: -5),
+            informationMessageView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
             informationMessageView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
             informationMessageView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
             informationMessageView.bottomAnchor.constraint(equalTo: personalMessageCollectionView.topAnchor, constant: -15),
@@ -134,7 +134,7 @@ class OutputMessageView: UIView {
     
     weak var delegate: OutputMessageViewDelegate?
     
-    private let contentTextField: UITextField = {
+    public let contentTextField: UITextField = {
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.backgroundColor = .white

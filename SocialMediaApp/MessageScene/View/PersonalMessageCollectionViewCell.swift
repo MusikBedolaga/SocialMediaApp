@@ -26,11 +26,13 @@ class PersonalMessageCollectionViewCell: UICollectionViewCell {
         label.font = UIFont.systemFont(ofSize: 16)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.text = "text"
+        label.lineBreakMode = .byWordWrapping
         return label
     }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        setupView()
     }
     
     required init?(coder: NSCoder) {
@@ -54,9 +56,10 @@ class PersonalMessageCollectionViewCell: UICollectionViewCell {
             bubbleView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
             bubbleView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -4),
             bubbleView.widthAnchor.constraint(lessThanOrEqualToConstant: 250),
-            bubbleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 5),
-            bubbleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5)
+            bubbleView.widthAnchor.constraint(equalTo: messageLabel.widthAnchor, constant: 24)
         ])
+            
+        messageLabel.setContentHuggingPriority(.required, for: .horizontal)
     }
     
     public func configure(with text: String, isOutgoing: Bool) {

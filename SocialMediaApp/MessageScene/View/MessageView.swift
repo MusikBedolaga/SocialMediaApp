@@ -17,7 +17,7 @@ class MessageView: UIView {
         return label
     }()
     
-    private let messageCollection: UICollectionView = {
+    public let messageCollection: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false

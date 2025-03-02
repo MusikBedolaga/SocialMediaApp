@@ -37,7 +37,13 @@ class MainCoordinator {
         }
     }
     
+    func goToUpdateMessages() {
+        tabBarController.selectedIndex = 1
+        let newMessageVC = MessagesViewController()
+        navigationController.setViewControllers([newMessageVC], animated: true)
+    }
     
+ 
     private func setupTabBar() {
         
         let feedVC = FeedViewController()
