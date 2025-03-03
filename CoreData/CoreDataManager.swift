@@ -24,6 +24,9 @@ class CoreDataManager {
                 fatalError("Unresolved error \(error), \(error.userInfo)")
             }
         })
+        
+        container.viewContext.automaticallyMergesChangesFromParent = true
+        
         return container
     }()
 
@@ -210,16 +213,15 @@ class CoreDataManager {
     func addNewMessage(content: String,
                        conversation: Conversation,
                        sender: User,
-                       receiver: User
-    ) {
+                       receiver: User) {
         persistentContainer.performBackgroundTask { context in
             let conversationInContext = context.object(with: conversation.objectID) as? Conversation
             let senderInContext = context.object(with: sender.objectID) as? User
             let receiverInContext = context.object(with: receiver.objectID) as? User
             
             guard let conversation = conversationInContext,
-                let sender = senderInContext,
-                let receiver = receiverInContext else {
+                  let sender = senderInContext,
+                  let receiver = receiverInContext else {
                 print("Ошибка: Не удалось получить объекты в фоновом контексте")
                 return
             }
@@ -227,14 +229,25 @@ class CoreDataManager {
             let message = Messages(context: context)
             message.content = content
             message.dateSent = Date()
-            message.conversation = conversationInContext
-            message.receiver = receiverInContext
-            message.sender = senderInContext
+            message.conversation = conversation
+            message.receiver = receiver
+            message.sender = sender
             
             do {
                 try context.save()
+                
+                DispatchQueue.main.async {
+                    let mainContext = self.persistentContainer.viewContext
+                    if mainContext.hasChanges {
+                        do {
+                            try mainContext.save()
+                        } catch {
+                            print("❌ Ошибка сохранения основного контекста: \(error.localizedDescription)")
+                        }
+                    }
+                }
             } catch {
-                print("Error: \(error.localizedDescription)")
+                print("❌ Ошибка сохранения в фоновом контексте: \(error.localizedDescription)")
             }
         }
     }
@@ -275,5 +288,4 @@ class CoreDataManager {
             return false
         }
     }
-
 }

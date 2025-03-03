@@ -12,7 +12,7 @@ class PersonalMessageViewController: UIViewController {
     
     private lazy var personalMessageView = PersonalMessageView(delegate: self)
     
-    private lazy var personalMessageViewModel = PersonalMessageViewModel(delegate: self)
+    private lazy var personalMessageViewModel = PersonalMessageViewModel(delegate: self, conversation: currentConversation!)
     
     private lazy var frc = personalMessageViewModel.fetchController
     
@@ -35,6 +35,10 @@ class PersonalMessageViewController: UIViewController {
         navigationItem.hidesBackButton = true
         view = personalMessageView
         personalMessageView.setupPersonalMessageCollection(delegate: self, dataSource: self)
+        
+        guard let conversation = currentConversation else { return }
+        let receiver = conversation.user1 == personalMessageViewModel.currentUser ? conversation.user2 : conversation.user1
+        personalMessageView.setupIndorationView(userImage: nil, userName: receiver?.name)
     }
     
     private func getCurrentOutputText() -> String {
@@ -42,7 +46,14 @@ class PersonalMessageViewController: UIViewController {
         return text
     }
     
-    func calculateHeightForText(_ text: String, width: CGFloat) -> CGFloat {
+    private func scrollToLastMessage() {
+        guard let messages = frc?.fetchedObjects, !messages.isEmpty else { return }
+        let lastIndexPath = IndexPath(item: messages.count - 1, section: 0)
+        
+        personalMessageView.personalMessageCollectionView.scrollToItem(at: lastIndexPath, at: .bottom, animated: true)
+    }
+    
+    private func calculateHeightForText(_ text: String, width: CGFloat) -> CGFloat {
         let label = UILabel()
         label.text = text
         label.numberOfLines = 0
@@ -56,7 +67,6 @@ class PersonalMessageViewController: UIViewController {
 //MARK: - OutputMessageViewDelegate
 extension PersonalMessageViewController: OutputMessageViewDelegate {
     func pushMessage() {
-        
         guard let conversation = currentConversation,
               let sender = personalMessageViewModel.currentUser,
               let receiver = (conversation.user1 == sender ? conversation.user2 : conversation.user1)
@@ -64,26 +74,36 @@ extension PersonalMessageViewController: OutputMessageViewDelegate {
             print("Ошибка: не удалось определить участников чата")
             return
         }
-        
+
         coreDataManager.addNewMessage(content: getCurrentOutputText(), conversation: conversation, sender: sender, receiver: receiver)
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                do {
+                    try self.frc?.performFetch()
+                    print("🔄 Принудительный performFetch() выполнен, найдено \(self.frc?.fetchedObjects?.count ?? 0) сообщений")
+                    self.personalMessageView.personalMessageCollectionView.reloadData()
+                } catch {
+                    print("❌ Ошибка загрузки сообщений: \(error.localizedDescription)")
+                }
+            }
         
-        DispatchQueue.main.async {
-            self.personalMessageView.personalMessageCollectionView.reloadData()
-        }
+        self.personalMessageView.outputMessageView.contentTextField.text = ""
+        
+        coreDataManager.saveContext()
     }
 }
 
 //MARK: - UICollectionViewDataSource
 extension PersonalMessageViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        personalMessageViewModel.fetchController.fetchedObjects?.count ?? 0
+        personalMessageViewModel.fetchController?.fetchedObjects?.count ?? 0
         
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = personalMessageView.personalMessageCollectionView.dequeueReusableCell(withReuseIdentifier: PersonalMessageCollectionViewCell.identifier, for: indexPath) as! PersonalMessageCollectionViewCell
         
-        let message = frc.object(at: indexPath)
+        guard let message = frc?.object(at: indexPath) else { return cell}
         let isOutgoing = message.sender == personalMessageViewModel.currentUser
         cell.configure(with: message.content!, isOutgoing: isOutgoing)
         
@@ -98,7 +118,7 @@ extension PersonalMessageViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
-        let message = frc.object(at: indexPath).content
+        let message = frc?.object(at: indexPath).content
         let maxWidth = collectionView.frame.width - 32
         let hight = calculateHeightForText(message!, width: maxWidth)
         
@@ -109,25 +129,40 @@ extension PersonalMessageViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         sideBetween
     }
-    
-//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-//        UIEdgeInsets(top: sideBetween, left:  0, bottom: 0, right: sideBetween )
-//        
-//    }
-
 }
 
 
 extension PersonalMessageViewController: NSFetchedResultsControllerDelegate {
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        if view.window != nil {
-            personalMessageView.personalMessageCollectionView.reloadData()
-        }
+        // Убираем лишние обновления, просто обновляем коллекцию
+        personalMessageView.personalMessageCollectionView.performBatchUpdates(nil, completion: nil)
     }
 
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        if view.window != nil {
-            personalMessageView.personalMessageCollectionView.reloadData()
+        
+        guard let messages = frc?.fetchedObjects, !messages.isEmpty else { return }
+        
+        let lastIndex = messages.count - 1
+        let indexPath = IndexPath(item: lastIndex, section: 0)
+        
+        DispatchQueue.main.async {
+            // Проверка, что данные в коллекции действительно изменились
+            let currentCount = self.personalMessageView.personalMessageCollectionView.numberOfItems(inSection: 0)
+            
+            // Если количество элементов в коллекции увеличилось (т.е. был добавлен новый элемент)
+            if currentCount < messages.count {
+                // Вставляем новый элемент, если индекс правильный
+                self.personalMessageView.personalMessageCollectionView.performBatchUpdates({
+                    self.personalMessageView.personalMessageCollectionView.insertItems(at: [indexPath])
+                }, completion: { _ in
+                    // Прокручиваем к последнему сообщению
+                    self.scrollToLastMessage()
+                })
+            } else {
+                // В противном случае просто перезагружаем всю коллекцию
+                self.personalMessageView.personalMessageCollectionView.reloadData()
+                print("Перезагружена коллекция, изменений не было.")
+            }
         }
     }
 }

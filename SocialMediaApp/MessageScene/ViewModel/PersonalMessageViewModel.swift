@@ -8,35 +8,48 @@
 import Foundation
 import CoreData
 
+
 class PersonalMessageViewModel {
     
     public var currentUser: User?
+    public var currentConversation: Conversation?
     
-    lazy var fetchController: NSFetchedResultsController<Messages> = {
-        let requst = Messages.fetchRequest()
-        
-        requst.predicate = NSPredicate(format: "sender == %@ OR receiver == %@", currentUser!, currentUser!)
-        
-        requst.sortDescriptors = [NSSortDescriptor(key: "dateSent", ascending: true)]
-        let frc = NSFetchedResultsController(fetchRequest: requst,
-                                             managedObjectContext: CoreDataManager.defaultConfig.persistentContainer.viewContext,
-                                             sectionNameKeyPath: nil,
-                                             cacheName: nil)
-        
-        do {
-            try frc.performFetch()
-        } catch {
-            print(error.localizedDescription)
-        }
-        
-        return frc
-    }()
+    var fetchController: NSFetchedResultsController<Messages>?
     
-    init(delegate: NSFetchedResultsControllerDelegate) {
+    init(delegate: NSFetchedResultsControllerDelegate, conversation: Conversation) {
+        self.currentConversation = conversation
+        
         CoreDataManager.defaultConfig.getCurrentUser { user in
             self.currentUser = user
-            self.fetchController.delegate = delegate
-            try? self.fetchController.performFetch()
+            self.setupFetchController(delegate: delegate)
+        }
+    }
+    
+    private func setupFetchController(delegate: NSFetchedResultsControllerDelegate) {
+        guard let currentConversation = currentConversation else { return }
+
+        CoreDataManager.defaultConfig.getCurrentUser { [weak self] user in
+            guard let self = self, let user = user else { return }
+            self.currentUser = user
+
+            let request = Messages.fetchRequest()
+            request.predicate = NSPredicate(format: "(sender == %@ OR receiver == %@) AND conversation == %@", user, user, currentConversation.objectID)
+            request.sortDescriptors = [NSSortDescriptor(key: "dateSent", ascending: true)]
+
+            let frc = NSFetchedResultsController(fetchRequest: request,
+                                                 managedObjectContext: CoreDataManager.defaultConfig.persistentContainer.viewContext,
+                                                 sectionNameKeyPath: nil,
+                                                 cacheName: nil)
+            
+            frc.delegate = delegate
+
+            do {
+                try frc.performFetch()
+            } catch {
+                print("Ошибка загрузки сообщений: \(error.localizedDescription)")
+            }
+
+            self.fetchController = frc
         }
     }
 }

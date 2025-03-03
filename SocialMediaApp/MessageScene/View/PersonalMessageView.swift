@@ -17,7 +17,7 @@ class PersonalMessageView: UIView {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.register(PersonalMessageCollectionViewCell.self, forCellWithReuseIdentifier: PersonalMessageCollectionViewCell.identifier)
-        collectionView.backgroundColor = .white
+        collectionView.backgroundColor = .lightBlue
         return collectionView
     }()
     
@@ -39,11 +39,13 @@ class PersonalMessageView: UIView {
     
     private func setupView() {
         
+        backgroundColor = .lightBlue
+        
         [informationMessageView, personalMessageCollectionView, outputMessageView].forEach({ addSubview($0) })
         
         //MARK: informationMessageView
         NSLayoutConstraint.activate([
-            informationMessageView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+            informationMessageView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: -40),
             informationMessageView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
             informationMessageView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
             informationMessageView.bottomAnchor.constraint(equalTo: personalMessageCollectionView.topAnchor, constant: -15),
@@ -73,11 +75,20 @@ class PersonalMessageView: UIView {
         personalMessageCollectionView.delegate = delegate
         personalMessageCollectionView.dataSource = dataSource
     }
+    
+    public func setupIndorationView(userImage: UIImage?, userName: String?) {
+        guard let name = userName else { return }
+        
+        let image = userImage == nil ? UIImage(named: "legaImage") : userImage
+        
+        self.informationMessageView.personName.text = name
+        self.informationMessageView.personImageView.image = image
+    }
 }
 
 class InformationMessageView: UIView {
     
-    private let personImageView: UIImageView = {
+    public let personImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.layer.cornerRadius = 22
@@ -85,7 +96,7 @@ class InformationMessageView: UIView {
         return imageView
     }()
     
-    private let personName: UILabel = {
+    public let personName: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .black
@@ -104,9 +115,11 @@ class InformationMessageView: UIView {
     
     private func setupView() {
         
-        self.translatesAutoresizingMaskIntoConstraints = false
+        backgroundColor = .lightBlue
         
-        backgroundColor = .green
+        setupShadow()
+        
+        self.translatesAutoresizingMaskIntoConstraints = false
         
         [personImageView, personName].forEach({ addSubview($0) })
         
@@ -123,6 +136,14 @@ class InformationMessageView: UIView {
             personName.centerYAnchor.constraint(equalTo: centerYAnchor),
             personName.leadingAnchor.constraint(equalTo: personImageView.trailingAnchor, constant: 10)
         ])
+    }
+    
+    private func setupShadow() {
+        layer.shadowColor = UIColor.black.cgColor
+        layer.shadowOpacity = 0.2
+        layer.shadowOffset = CGSize(width: 0, height: 2)
+        layer.shadowRadius = 4
+        layer.masksToBounds = false
     }
 }
 
@@ -167,7 +188,10 @@ class OutputMessageView: UIView {
         
         self.translatesAutoresizingMaskIntoConstraints = false
         
-        backgroundColor = .red
+        backgroundColor = .white
+        
+        layer.borderColor = UIColor.black.cgColor
+        layer.borderWidth = 1
         
         [contentTextField, pushMessageButton].forEach({ addSubview($0) })
         

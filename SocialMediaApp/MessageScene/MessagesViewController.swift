@@ -85,7 +85,6 @@ extension MessagesViewController: UICollectionViewDataSource {
         personalMessageVC.currentConversation = frc.object(at: indexPath)
         navigationController?.pushViewController(personalMessageVC, animated: true)
     }
-    
 }
 
 //MARK: - NSFetchedResultsControllerDelegate
