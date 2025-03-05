@@ -176,6 +176,15 @@ class ProfileView: UIView {
         return collectionView
     }()
     
+    private let userTag: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.numberOfLines = 0
+        label.font = UIFont.systemFont(ofSize: 15, weight: .bold)
+        label.text = "@tag"
+        return label
+    }()
+    
     init() {
         super.init(frame: .zero)
         layout()
@@ -208,7 +217,7 @@ class ProfileView: UIView {
             mainView.heightAnchor.constraint(greaterThanOrEqualTo: scroll.heightAnchor)
         ])
         
-        [profileView, followView, postLabel, postCollection].forEach({ mainView.addSubview($0) })
+        [profileView, followView, postLabel, postCollection, userTag].forEach({ mainView.addSubview($0) })
         
         //MARK: profileView
         NSLayoutConstraint.activate([
@@ -235,9 +244,15 @@ class ProfileView: UIView {
             followView.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -48)
         ])
         
+        //MARK: userTag
+        NSLayoutConstraint.activate([
+            userTag.centerXAnchor.constraint(equalTo: mainView.centerXAnchor),
+            userTag.topAnchor.constraint(equalTo: profileImage.bottomAnchor, constant: 15)
+        ])
+        
         //MARK: postLabel
         NSLayoutConstraint.activate([
-            postLabel.topAnchor.constraint(equalTo: followView.bottomAnchor, constant: 30),
+            postLabel.topAnchor.constraint(equalTo: userTag.bottomAnchor, constant: 20),
             postLabel.centerXAnchor.constraint(equalTo: mainView.centerXAnchor)
         ])
         
@@ -253,5 +268,9 @@ class ProfileView: UIView {
     public func setupProfilePostCollection(delegate: UICollectionViewDelegate, dataSource: UICollectionViewDataSource) {
         postCollection.delegate = delegate
         postCollection.dataSource = dataSource
+    }
+    
+    public func setupUser(tag: String) {
+        userTag.text = tag
     }
 }

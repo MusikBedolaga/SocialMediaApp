@@ -65,7 +65,7 @@ class PersonalMessageViewController: UIViewController {
 }
 
 //MARK: - OutputMessageViewDelegate
-extension PersonalMessageViewController: OutputMessageViewDelegate {
+extension PersonalMessageViewController: PersonalMessageDelegate {
     func pushMessage() {
         guard let conversation = currentConversation,
               let sender = personalMessageViewModel.currentUser,
@@ -90,6 +90,10 @@ extension PersonalMessageViewController: OutputMessageViewDelegate {
         self.personalMessageView.outputMessageView.contentTextField.text = ""
         
         coreDataManager.saveContext()
+    }
+    
+    func goBack() {
+        navigationController?.popViewController(animated: true)
     }
 }
 

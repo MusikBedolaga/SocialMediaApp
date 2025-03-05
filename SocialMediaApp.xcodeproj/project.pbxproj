@@ -10,7 +10,6 @@
 		3410BFD52CE6977900D9A6A2 /* IconViewFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3410BFD42CE6977900D9A6A2 /* IconViewFactory.swift */; };
 		3482CCBE2CDD767A00AFBD62 /* TabBarItemFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3482CCBD2CDD767A00AFBD62 /* TabBarItemFactory.swift */; };
 		3482CCC02CDD790C00AFBD62 /* UIColor+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3482CCBF2CDD790C00AFBD62 /* UIColor+Extension.swift */; };
-		3482CCE62CDD806700AFBD62 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3482CCE52CDD806700AFBD62 /* SettingsViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,7 +33,6 @@
 		3410BFD42CE6977900D9A6A2 /* IconViewFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconViewFactory.swift; sourceTree = "<group>"; };
 		3482CCBD2CDD767A00AFBD62 /* TabBarItemFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarItemFactory.swift; sourceTree = "<group>"; };
 		3482CCBF2CDD790C00AFBD62 /* UIColor+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
-		3482CCE52CDD806700AFBD62 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		34F9823E2CD6D45A00ECA54E /* SocialMediaApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SocialMediaApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		34F982582CD6D45B00ECA54E /* SocialMediaAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SocialMediaAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		34F982622CD6D45B00ECA54E /* SocialMediaAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SocialMediaAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -110,7 +108,6 @@
 			isa = PBXGroup;
 			children = (
 				3410BFD42CE6977900D9A6A2 /* IconViewFactory.swift */,
-				3482CCE52CDD806700AFBD62 /* SettingsViewController.swift */,
 				3482CCBF2CDD790C00AFBD62 /* UIColor+Extension.swift */,
 				3482CCBD2CDD767A00AFBD62 /* TabBarItemFactory.swift */,
 				34A6D9D02D0B910A005F9AC3 /* CoreData */,
@@ -280,7 +277,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3482CCE62CDD806700AFBD62 /* SettingsViewController.swift in Sources */,
 				3410BFD52CE6977900D9A6A2 /* IconViewFactory.swift in Sources */,
 				3482CCBE2CDD767A00AFBD62 /* TabBarItemFactory.swift in Sources */,
 				3482CCC02CDD790C00AFBD62 /* UIColor+Extension.swift in Sources */,

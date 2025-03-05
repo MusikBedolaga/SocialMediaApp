@@ -7,6 +7,11 @@
 
 import UIKit
 
+protocol PersonalMessageDelegate: AnyObject {
+    func goBack()
+    func pushMessage()
+}
+
 class PersonalMessageView: UIView {
     
     private let informationMessageView: InformationMessageView = InformationMessageView()
@@ -21,14 +26,15 @@ class PersonalMessageView: UIView {
         return collectionView
     }()
     
-    private weak var delegate: OutputMessageViewDelegate?
+    private weak var delegate: PersonalMessageDelegate?
     
     public let outputMessageView: OutputMessageView
     
-    init(delegate: OutputMessageViewDelegate) {
+    init(delegate: PersonalMessageDelegate) {
         self.outputMessageView = OutputMessageView()
         super.init(frame: .zero)
         self.outputMessageView.delegate = delegate
+        self.informationMessageView.delegate = delegate
         self.delegate = delegate
         setupView()
     }
@@ -86,7 +92,13 @@ class PersonalMessageView: UIView {
     }
 }
 
+protocol InformationMessageViewDelegate: AnyObject {
+    func goBack()
+}
+
 class InformationMessageView: UIView {
+    
+    weak var delegate: PersonalMessageDelegate?
     
     public let personImageView: UIImageView = {
         let imageView = UIImageView()
@@ -102,6 +114,17 @@ class InformationMessageView: UIView {
         label.textColor = .black
         label.font = UIFont.systemFont(ofSize: 17, weight: .semibold)
         return label
+    }()
+    
+    private let backButton: UIButton = {
+        let button = UIButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setImage(UIImage(systemName: "arrowshape.backward.fill"), for: .normal)
+        button.backgroundColor = .customRed
+        button.layer.cornerRadius = 22
+        button.tintColor = .white
+        button.addTarget(self, action: #selector(goBack), for: .touchUpInside)
+        return button
     }()
     
     init() {
@@ -121,7 +144,7 @@ class InformationMessageView: UIView {
         
         self.translatesAutoresizingMaskIntoConstraints = false
         
-        [personImageView, personName].forEach({ addSubview($0) })
+        [personImageView, personName, backButton].forEach({ addSubview($0) })
         
         //MARK: personImageView
         NSLayoutConstraint.activate([
@@ -136,6 +159,14 @@ class InformationMessageView: UIView {
             personName.centerYAnchor.constraint(equalTo: centerYAnchor),
             personName.leadingAnchor.constraint(equalTo: personImageView.trailingAnchor, constant: 10)
         ])
+        
+        //MARK: backButton
+        NSLayoutConstraint.activate([
+            backButton.centerYAnchor.constraint(equalTo: centerYAnchor),
+            backButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
+            backButton.widthAnchor.constraint(equalToConstant: 44),
+            backButton.heightAnchor.constraint(equalToConstant: 44)
+        ])
     }
     
     private func setupShadow() {
@@ -145,6 +176,10 @@ class InformationMessageView: UIView {
         layer.shadowRadius = 4
         layer.masksToBounds = false
     }
+    
+    @objc private func goBack() {
+        delegate?.goBack()
+    }
 }
 
 protocol OutputMessageViewDelegate: AnyObject {
@@ -153,7 +188,7 @@ protocol OutputMessageViewDelegate: AnyObject {
 
 class OutputMessageView: UIView {
     
-    weak var delegate: OutputMessageViewDelegate?
+    weak var delegate: PersonalMessageDelegate?
     
     public let contentTextField: UITextField = {
         let textField = UITextField()
@@ -167,9 +202,10 @@ class OutputMessageView: UIView {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.backgroundColor = .customRed
-        button.setImage(UIImage(systemName: "paperplane"), for: .normal)
+        button.setImage(UIImage(systemName: "paperplane.fill"), for: .normal)
         button.layer.cornerRadius = 20
         button.addTarget(self, action: #selector(pushMessage), for: .touchUpInside)
+        button.tintColor = .white
         return button
     }()
     

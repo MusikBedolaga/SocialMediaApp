@@ -42,4 +42,8 @@ class ProfilePostCollectionViewCell: UICollectionViewCell {
             postImage.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
         ])
     }
+    
+    public func configure(image: Data) {
+        postImage.image = UIImage(data: image)
+    }
 }

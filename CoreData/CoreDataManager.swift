@@ -88,6 +88,9 @@ class CoreDataManager {
         }
     }
     
+    
+    
+    
     func existsUser(email: String, completion: @escaping (Bool) -> Void) {
         persistentContainer.performBackgroundTask { context in
             let fetchRequst: NSFetchRequest<User> = User.fetchRequest()

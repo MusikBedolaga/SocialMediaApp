@@ -6,10 +6,18 @@
 //
 
 import UIKit
+import CoreData
 
 class ProfileViewController: UIViewController {
 
     private lazy var profileView: ProfileView = ProfileView()
+    
+    private lazy var profileViewModel: ProfileViewModel = ProfileViewModel(delegate: self)
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        profileView.postCollection.reloadData()
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,6 +35,8 @@ class ProfileViewController: UIViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: profileView.checkNewMessageButton)
         
         profileView.setupProfilePostCollection(delegate: self, dataSource: self)
+        
+        profileView.setupUser(tag: profileViewModel.currentUser?.tag ?? "@tag")
     }
     
     @objc private func backToFeed() {
@@ -58,11 +68,26 @@ extension ProfileViewController: UICollectionViewDelegateFlowLayout {
 //MARK: - UICollectionViewDataSource
 extension ProfileViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        15
+        profileViewModel.frc?.fetchedObjects?.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ProfilePostCollectionViewCell.identifier, for: indexPath) as! ProfilePostCollectionViewCell
+        
+        guard let post = profileViewModel.frc?.object(at: indexPath), let content = post.content else { return cell}
+        cell.configure(image: content)
+        
         return cell
+    }
+}
+
+//MARK: - NSFetchedResultsControllerDelegate
+extension ProfileViewController: NSFetchedResultsControllerDelegate {
+    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        self.profileView.postCollection.reloadData()
+    }
+    
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<any NSFetchRequestResult>) {
+        self.profileView.postCollection.reloadData()
     }
 }

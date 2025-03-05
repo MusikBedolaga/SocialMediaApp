@@ -26,7 +26,7 @@ class CreatNewChatViewModel {
             guard let user = user else { return }
             
             let request = User.fetchRequest()
-            request.predicate = NSPredicate(format: "SELF != %@", user)
+            request.predicate = NSPredicate(format: "SELF != %@ AND email != %@", user, user.email ?? "")
             request.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
             
             let frc = NSFetchedResultsController(fetchRequest: request,
@@ -34,7 +34,6 @@ class CreatNewChatViewModel {
                                                  sectionNameKeyPath: nil,
                                                  cacheName: nil)
             frc.delegate = self.delegate
-            
             do {
                 try frc.performFetch()
                 DispatchQueue.main.async {

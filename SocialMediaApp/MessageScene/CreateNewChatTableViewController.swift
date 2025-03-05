@@ -28,7 +28,15 @@ class CreateNewChatTableViewController: UITableViewController {
         
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "reuseIdentifier")
         
-        NotificationCenter.default.addObserver(self, selector: #selector(updateUI), name: NSNotification.Name("NewChatDataUpdated"), object: nil)
+        do {
+            try frc?.performFetch()
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+                NotificationCenter.default.post(name: NSNotification.Name("NewChatDataUpdated"), object: nil)
+            }
+        } catch {
+            print("Ошибка загрузки пользователей: \(error.localizedDescription)")
+        }
     }
     
     @objc private func updateUI() {
@@ -81,11 +89,12 @@ class CreateNewChatTableViewController: UITableViewController {
 
 extension CreateNewChatTableViewController: NSFetchedResultsControllerDelegate {
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        print("1")
         tableView.reloadData()
     }
 
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        print("2")
         tableView.reloadData()
     }
-
 }

@@ -35,19 +35,6 @@ class NewPublicationViewController: UIViewController {
 //MARK: - NewPublicationViewDelegate
 extension NewPublicationViewController: NewPublicationViewDelegate {
     
-//    func addPost() {
-//        guard let image = self.newPublicationView.selectedImageView.image else { return }
-//        let imageData = image.jpegData(compressionQuality: 1.0)
-//        coreDataManager.addPostToUser(userId: currentUserId!, postContent: imageData!) { succes in
-//            if succes {
-//                print("Post created successfully!")
-//            } else {
-//                print("Failed to create post.")
-//            }
-//        }
-//        navigationController?.pushViewController(FeedViewController(), animated: true)
-//    }
-    
     func addPost() {
         coreDataManager.getCurrentUser { user in
             guard let image = self.newPublicationView.selectedImageView.image, let userId = user?.userId  else { return }
