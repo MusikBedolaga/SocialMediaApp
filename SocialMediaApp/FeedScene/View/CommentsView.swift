@@ -28,15 +28,15 @@ class CommentsView: UIView {
         let collection = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collection.translatesAutoresizingMaskIntoConstraints = false
         collection.register(CommentsCollectionViewCell.self, forCellWithReuseIdentifier: CommentsCollectionViewCell.identifier)
-//        collection.backgroundColor = .red
+        layout.estimatedItemSize = CGSize(width: UIScreen.main.bounds.width, height: 50)
         return collection
     }()
     
-    private let createComment: UITextView = {
+    public let createComment: UITextView = {
         let textView = UITextView()
         textView.translatesAutoresizingMaskIntoConstraints = false
-        textView.textColor = .customLightGray
-        textView.backgroundColor = .black
+        textView.textColor = .black
+        textView.backgroundColor = .white
         textView.font = UIFont.systemFont(ofSize: 14)
         textView.layer.borderColor = UIColor.black.cgColor
         textView.layer.borderWidth = 2

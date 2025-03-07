@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23231" systemVersion="23F79" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
+    <entity name="Comments" representedClassName="Comments" syncable="YES" codeGenerationType="class">
+        <attribute name="content" optional="YES" attributeType="String"/>
+        <attribute name="countLike" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="createAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <relationship name="post" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Post" inverseName="comments" inverseEntity="Post"/>
+        <relationship name="user" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="comment" inverseEntity="User"/>
+    </entity>
     <entity name="Conversation" representedClassName="Conversation" syncable="YES" codeGenerationType="class">
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <relationship name="messages" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Messages" inverseName="conversation" inverseEntity="Messages"/>
@@ -20,6 +28,7 @@
         <attribute name="countComments" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="likes" optional="YES" attributeType="String"/>
+        <relationship name="comments" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Comments" inverseName="post" inverseEntity="Comments"/>
         <relationship name="user" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="posts" inverseEntity="User"/>
     </entity>
     <entity name="User" representedClassName="User" syncable="YES" codeGenerationType="class">
@@ -28,6 +37,7 @@
         <attribute name="photo" optional="YES" attributeType="Binary"/>
         <attribute name="tag" optional="YES" attributeType="String"/>
         <attribute name="userId" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="comment" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Comments" inverseName="user" inverseEntity="Comments"/>
         <relationship name="conversationsAsUser1" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Conversation" inverseName="user1" inverseEntity="Conversation"/>
         <relationship name="conversationsAsUser2" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Conversation" inverseName="user2" inverseEntity="Conversation"/>
         <relationship name="messagesReceived" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Messages" inverseName="receiver" inverseEntity="Messages"/>

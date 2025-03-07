@@ -94,9 +94,13 @@ class MessageCollectionViewCell: UICollectionViewCell {
         ])
     }
     
-    public func setupCell(userImage: UIImage?, userName: String) {
-        self.userImage.image = userImage ?? UIImage(named: "legaImage")
+    public func setupCell(userImage: Data?, userName: String) {
         self.userName.text = userName
+        guard let imageData = userImage else {
+            self.userImage.image = UIImage(named: "legaImage")
+            return
+        }
+        self.userImage.image = UIImage(data: imageData)
     }
     
     private func setupShadow() {

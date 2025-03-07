@@ -36,7 +36,6 @@ class CommentsCollectionViewCell: UICollectionViewCell {
         label.font = UIFont.systemFont(ofSize: 12)
         label.textColor = .black
         label.numberOfLines = 0
-        label.backgroundColor = .blue
         return label
     }()
     
@@ -69,10 +68,12 @@ class CommentsCollectionViewCell: UICollectionViewCell {
     private func layout() {
         [userImageView, userName, commentText, countLikesView, likeImageView].forEach({ contentView.addSubview($0) })
         
+        contentView.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width).isActive = true
+        
         //MARK: userImageView
         NSLayoutConstraint.activate([
             userImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
-            userImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: -10),
+            userImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
             userImageView.widthAnchor.constraint(equalToConstant: 40),
             userImageView.heightAnchor.constraint(equalTo: userImageView.widthAnchor)
         ])
@@ -85,8 +86,8 @@ class CommentsCollectionViewCell: UICollectionViewCell {
         
         //MARK: commentText
         NSLayoutConstraint.activate([
-            commentText.topAnchor.constraint(equalTo: userImageView.bottomAnchor, constant: 5),
-            commentText.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
+            commentText.topAnchor.constraint(equalTo: userImageView.bottomAnchor, constant: 10),
+            commentText.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             commentText.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
             commentText.bottomAnchor.constraint(equalTo: countLikesView.bottomAnchor, constant: -40)
         ])
@@ -104,5 +105,20 @@ class CommentsCollectionViewCell: UICollectionViewCell {
             likeImageView.trailingAnchor.constraint(equalTo: countLikesView.leadingAnchor, constant: -5),
             likeImageView.heightAnchor.constraint(equalTo: countLikesView.heightAnchor)
         ])
+    }
+    
+    public func setupCell(image: Data?,
+                          name: String,
+                          content: String,
+                          countLike: Int32) {
+        userName.text = name
+        commentText.text = content
+        guard let imageData = image else {
+            userImageView.image = UIImage(named: "lega")
+            return
+        }
+        userImageView.image = UIImage(data: imageData)
+        
+        countLikesView.text = "\(countLike)"
     }
 }

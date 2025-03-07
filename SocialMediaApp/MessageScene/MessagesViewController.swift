@@ -74,7 +74,8 @@ extension MessagesViewController: UICollectionViewDataSource {
         let chatPartner = (conversation.user1 == currentUser) ? conversation.user2 : conversation.user1
         
         if let partnerName = chatPartner?.name {
-            cell.setupCell(userImage: nil, userName: partnerName)
+            let partnerImage: Data? = chatPartner?.photo
+            cell.setupCell(userImage: partnerImage, userName: partnerName)
         }
 
         return cell

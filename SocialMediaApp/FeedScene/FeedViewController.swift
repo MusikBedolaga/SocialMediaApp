@@ -90,7 +90,9 @@ extension FeedViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if collectionView == feedView.postCollection {
+            let post = frc.object(at: indexPath)
             let commentsVC = CommentsViewController()
+            commentsVC.currentPost = post
             present(commentsVC, animated: true)
         }
     }

@@ -145,6 +145,7 @@ class CoreDataManager {
 
     }
     
+    
     //MARK: - Post
     func deletePost(delPost: Post) {
         persistentContainer.performBackgroundTask { context in
@@ -212,7 +213,7 @@ class CoreDataManager {
         }
     
     
-    //MARK: Message
+    //MARK: - Message
     func addNewMessage(content: String,
                        conversation: Conversation,
                        sender: User,
@@ -267,7 +268,8 @@ class CoreDataManager {
         }
     }
     
-    //MARK: Conversation
+    
+    //MARK: - Conversation
     func addNewConversation(user1: User, user2: User) {
         if chatExistsBetween(user1: user1, user2: user2) {
             print("Чат уже существует между \(user1.name ?? "Unknown") и \(user2.name ?? "Unknown")")
@@ -312,6 +314,28 @@ class CoreDataManager {
         } catch {
             print("Ошибка проверки чата: \(error.localizedDescription)")
             return false
+        }
+    }
+    
+    
+    //MARK: - Comments
+    func addNewComment(content: String, post: Post, user: User) {
+        persistentContainer.performBackgroundTask { context in
+            let postInContext = context.object(with: post.objectID) as? Post
+            let userInContext = context.object(with: user.objectID) as? User
+            
+            let comment = Comments(context: context)
+            comment.content = content
+            comment.createAt = Date()
+            comment.post = postInContext
+            comment.countLike = 0
+            comment.user = userInContext
+            
+            do {
+                try context.save()
+            } catch {
+                print("Error: \(error.localizedDescription)")
+            }
         }
     }
 }
