@@ -81,9 +81,39 @@ extension MessagesViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let personalMessageVC = PersonalMessageViewController()
-        personalMessageVC.currentConversation = frc.object(at: indexPath)
-        navigationController?.pushViewController(personalMessageVC, animated: true)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            let personalMessageVC = PersonalMessageViewController()
+            personalMessageVC.currentConversation = self.frc.object(at: indexPath)
+            self.navigationController?.pushViewController(personalMessageVC, animated: true)
+        }
+    }
+}
+
+//MARK: - UICollectionViewDelegate
+extension MessagesViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, trailingSwipeActionsConfigurationForItemAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        print("Trailing swipe action triggered")
+        let deleteAction = UIContextualAction(style: .destructive, title: "Удалить") { _ , _, completionHandler in
+            let conversation = self.frc.object(at: indexPath)
+            self.messageViewModel.deleteConversation(conversation: conversation)
+            completionHandler(true)
+        }
+
+        deleteAction.backgroundColor = UIColor.red
+        
+        return UISwipeActionsConfiguration(actions: [deleteAction])
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, leadingSwipeActionsConfigurationForItemAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        print("Leading swipe action triggered")
+        let pinAction = UIContextualAction(style: .normal, title: "Закрепить") { _, _, completionHandler in
+            print("Чат закреплён")
+            completionHandler(true)
+        }
+        
+        pinAction.backgroundColor = UIColor.systemBlue // Синий цвет для закрепления
+
+        return UISwipeActionsConfiguration(actions: [pinAction])
     }
 }
 

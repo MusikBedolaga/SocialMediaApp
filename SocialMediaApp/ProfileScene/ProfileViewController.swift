@@ -17,6 +17,8 @@ class ProfileViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         profileView.postCollection.reloadData()
+        profileView.setupUser(tag: profileViewModel.currentUser?.tag ?? "@tag",
+                              image: profileViewModel.currentUser?.photo ?? Data())
     }
     
     override func viewDidLoad() {
@@ -35,8 +37,6 @@ class ProfileViewController: UIViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: profileView.checkNewMessageButton)
         
         profileView.setupProfilePostCollection(delegate: self, dataSource: self)
-        
-        profileView.setupUser(tag: profileViewModel.currentUser?.tag ?? "@tag")
     }
     
     @objc private func backToFeed() {

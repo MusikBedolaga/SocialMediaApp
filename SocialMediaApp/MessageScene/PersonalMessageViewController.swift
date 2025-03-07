@@ -62,6 +62,31 @@ class PersonalMessageViewController: UIViewController {
         label.sizeToFit()
         return label.frame.height
     }
+    
+    @objc private func handleSwipe(_ gesture: UISwipeGestureRecognizer) {
+        guard let cell = gesture.view as? PersonalMessageCollectionViewCell else { return }
+        
+        guard let indexPath = personalMessageView.personalMessageCollectionView.indexPath(for: cell) else { return }
+        
+        switch gesture.direction {
+        case .left:
+            print("Свайп влево на ячейке с индексом: \(indexPath.row)")
+            showRightSwipeMenu(for: indexPath)
+        default:
+            break
+        }
+    }
+    
+    func showRightSwipeMenu(for indexPath: IndexPath) {
+        guard let message = frc?.object(at: indexPath) else { return }
+        
+        let alertController = UIAlertController(title: "Опции", message: "Что вы хотите сделать?", preferredStyle: .actionSheet)
+        alertController.addAction(UIAlertAction(title: "Удалить", style: .destructive, handler: { _ in
+            self.personalMessageViewModel.deleteMessage(message: message)
+        }))
+        alertController.addAction(UIAlertAction(title: "Отмена", style: .cancel, handler: nil))
+        present(alertController, animated: true, completion: nil)
+    }
 }
 
 //MARK: - OutputMessageViewDelegate
@@ -107,15 +132,21 @@ extension PersonalMessageViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = personalMessageView.personalMessageCollectionView.dequeueReusableCell(withReuseIdentifier: PersonalMessageCollectionViewCell.identifier, for: indexPath) as! PersonalMessageCollectionViewCell
         
-        guard let message = frc?.object(at: indexPath) else { return cell}
+        guard let message = frc?.object(at: indexPath) else { return cell }
         let isOutgoing = message.sender == personalMessageViewModel.currentUser
         cell.configure(with: message.content!, isOutgoing: isOutgoing)
         
+        // Добавление жеста свайпа влево
+        let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(_:)))
+        swipeLeft.direction = .left
+        cell.addGestureRecognizer(swipeLeft)
+        
         return cell
     }
+
 }
 
-//MARK: - UICollectionViewDataSource
+//MARK: - UICollectionViewDelegateFlowLayout
 extension PersonalMessageViewController: UICollectionViewDelegateFlowLayout {
     var sideInsert: CGFloat { return 5 }
     var sideBetween: CGFloat { return 3 }
@@ -135,7 +166,7 @@ extension PersonalMessageViewController: UICollectionViewDelegateFlowLayout {
     }
 }
 
-
+//MARK: - NSFetchedResultsControllerDelegate
 extension PersonalMessageViewController: NSFetchedResultsControllerDelegate {
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         // Убираем лишние обновления, просто обновляем коллекцию

@@ -255,6 +255,18 @@ class CoreDataManager {
         }
     }
     
+    func deleteMessage(delMessage: Messages) {
+        persistentContainer.performBackgroundTask { context in
+            guard let messageInContext = context.object(with: delMessage.objectID) as? Messages else { return }
+            context.delete(messageInContext)
+            do {
+                try context.save()
+            } catch {
+                print("Error: \(error.localizedDescription)")
+            }
+        }
+    }
+    
     //MARK: Conversation
     func addNewConversation(user1: User, user2: User) {
         if chatExistsBetween(user1: user1, user2: user2) {
@@ -270,6 +282,17 @@ class CoreDataManager {
             
             conversation.user1 = user1InContext
             conversation.user2 = user2InContext
+            do {
+                try context.save()
+            } catch {
+                print("Error: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    func deleteConversation(delConversation: Conversation) {
+        persistentContainer.performBackgroundTask { context in
+            context.delete(delConversation)
             do {
                 try context.save()
             } catch {

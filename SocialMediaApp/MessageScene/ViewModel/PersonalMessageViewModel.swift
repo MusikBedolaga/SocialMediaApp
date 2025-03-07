@@ -52,4 +52,8 @@ class PersonalMessageViewModel {
             self.fetchController = frc
         }
     }
+    
+    public func deleteMessage(message: Messages) {
+        CoreDataManager.defaultConfig.deleteMessage(delMessage: message)
+    }
 }

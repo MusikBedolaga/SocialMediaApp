@@ -270,7 +270,8 @@ class ProfileView: UIView {
         postCollection.dataSource = dataSource
     }
     
-    public func setupUser(tag: String) {
+    public func setupUser(tag: String, image: Data) {
         userTag.text = tag
+        profileImage.image = UIImage(data: image)
     }
 }

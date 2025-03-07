@@ -23,6 +23,9 @@ class MessageView: UIView {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.register(MessageCollectionViewCell.self, forCellWithReuseIdentifier: MessageCollectionViewCell.identifier)
         collectionView.backgroundColor = .white
+        collectionView.allowsSelection = true
+        collectionView.allowsMultipleSelection = false
+
         return collectionView
     }()
     
@@ -42,10 +45,13 @@ class MessageView: UIView {
         //MARK: messageCollection
         NSLayoutConstraint.activate([
             messageCollection.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
-            messageCollection.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
-            messageCollection.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+            messageCollection.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
+            messageCollection.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
             messageCollection.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor)
         ])
+        messageCollection.gestureRecognizers?.forEach { gesture in
+            messageCollection.removeGestureRecognizer(gesture)
+        }
     }
     
     public func setupMessageCollection(delegate: UICollectionViewDelegate, dataSource: UICollectionViewDataSource) {

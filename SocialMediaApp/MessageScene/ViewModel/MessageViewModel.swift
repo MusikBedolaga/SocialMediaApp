@@ -34,6 +34,10 @@ class MessagesViewModel {
         return frc
     }()
     
+    public func deleteConversation(conversation: Conversation) {
+        CoreDataManager.defaultConfig.deleteConversation(delConversation: conversation)
+    }
+    
     init(delegate: NSFetchedResultsControllerDelegate) {
         CoreDataManager.defaultConfig.getCurrentUser { user in
             self.currentUser = user
